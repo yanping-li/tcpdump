@@ -2489,7 +2489,13 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	++infodelay;
 
+    /* reset pkt context before print */
+    memset(&pkt_ctxt, 0, sizeof(struct pkt_context));
+    pkt_ctxt.user = user;
+
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
+
+    conn_consume_pak(&pkt_ctxt);
 
 	--infodelay;
 	if (infoprint)
