@@ -2506,7 +2506,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
     /* start stat */
-    conn_consume_pak(&pkt_ctxt.src_addr, &pkt_ctxt.dst_addr, pkt_ctxt.proto,
+    conn_consume_pak(&pkt_ctxt.src_ip, &pkt_ctxt.dst_ip, pkt_ctxt.proto,
             pkt_ctxt.src_port, pkt_ctxt.dst_port, pkt_ctxt.pkt_len);
     /* end stat */
 

@@ -20,8 +20,6 @@
 #include "ip.h"
 #include "ipproto.h"
 
-#include "stat.h"
-
 struct global_context global_ctxt;
 struct pkt_context pkt_ctxt;
 
@@ -181,9 +179,10 @@ int conn_print(struct conn* conn)
 
 void conn_iterate(conn_handler handler)
 {
+    int i;
     struct conn_hash_entry *entry;
 
-    for (int i = 0; i < CONN_HASHSIZE; i++) {
+    for (i = 0; i < CONN_HASHSIZE; i++) {
         for (entry = conn_hashtbl[i]; entry; entry = entry->next) {
             (*handler)(entry->conn);
         }
