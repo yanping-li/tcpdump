@@ -8,14 +8,6 @@ struct global_context {
     u_char *user;
 };
 
-struct pkt_context {
-    ipvx_addr src_addr;
-    ipvx_addr dst_addr;
-    uint8 proto;
-    uint16 src_port;
-    uint16 dst_port;
-};
-
 enum addr_type {
 	ADDR_IP,
 	ADDR_IP6
@@ -29,23 +21,30 @@ enum addr_type {
 struct ipvx_addr {
     enum addr_type type;
     union {
-        uint32 __ip;
-        in6_addr __ip6;
+        uint32_t __ip;
+        struct in6_addr __ip6;
     } __addr;
 };
 
-bool ipvx_equal(struct ipvx_addr *addr1, struct ipvx_addr *addr2);
+struct pkt_context {
+    struct ipvx_addr src_ip;
+    struct ipvx_addr dst_ip;
+    uint8_t proto;
+    uint16_t src_port;
+    uint16_t dst_port;
+    uint32_t pkt_len;
+};
 
 struct conn {
-    ipvx_addr src_ip;
-    ipvx_addr dst_ip;
-    uint16 src_port;
-    uint16 dst_port;
-    uint8 proto;
-    uint32 in_paks;
-    uint32 out_paks;
-    uint32 in_bytes;
-    uint32 out_bytes;
+    struct ipvx_addr src_ip;
+    struct ipvx_addr dst_ip;
+    uint16_t src_port;
+    uint16_t dst_port;
+    uint8_t proto;
+    uint32_t in_paks;
+    uint32_t out_paks;
+    uint32_t in_bytes;
+    uint32_t out_bytes;
 };
 
 struct conn_hash_entry {
@@ -53,13 +52,23 @@ struct conn_hash_entry {
     void *conn;
 };
 
-int conn_consume_pak(struct ipvx_addr *src_addr, struct ipvx_addr *dst_addr,
-        uint8 proto, uint16 src_port, uint16 dst_port, uint32 pak_len);
+extern struct global_context global_ctxt;
+extern struct pkt_context pkt_ctxt;
 
-typedef int (*)(struct conn *conn) callback_t;
+extern uint32_t stat_ip;
+extern uint32_t stat_ipfrag;
 
-int conn_iterate(callback_t);
+extern uint32_t stat_ip6;
 
-int conn_print(struct conn *);
+extern uint32_t stat_arp;
+extern uint32_t stat_arp_request;
+extern uint32_t stat_arp_reply;
+
+extern int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
+        uint8_t proto, uint16_t src_port, uint16_t dst_port, uint32_t pak_len);
+typedef int (*conn_handler)(struct conn *conn);
+extern int conn_print(struct conn *);
+extern void conn_iterate(conn_handler);
+extern void stat_print();
 
 #endif /* netdissect_stat_h */

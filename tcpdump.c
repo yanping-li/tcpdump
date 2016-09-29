@@ -1992,9 +1992,9 @@ main(int argc, char **argv)
 		error("unable to enter the capability mode");
 #endif	/* HAVE_CAPSICUM */
 
-    /* start conn */
+    /* start stat */
     global_ctxt.user = pcap_userdata;
-    /* end conn */
+    /* end stat */
 
 	do {
 		status = pcap_loop(pd, cnt, callback, pcap_userdata);
@@ -2111,10 +2111,10 @@ main(int argc, char **argv)
 	}
 	while (ret != NULL);
 
-    /* start conn */
+    /* start stat */
     conn_iterate(conn_print);
     stat_print();
-    /* end conn */
+    /* end stat */
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
@@ -2498,13 +2498,17 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	++infodelay;
 
+    /* start stat */
     /* reset pkt context before print */
     memset(&pkt_ctxt, 0, sizeof(struct pkt_context));
-    pkt_ctxt.user = user;
+    /* end stat */
 
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
-    conn_consume_pak(&pkt_ctxt);
+    /* start stat */
+    conn_consume_pak(&pkt_ctxt.src_addr, &pkt_ctxt.dst_addr, pkt_ctxt.proto,
+            pkt_ctxt.src_port, pkt_ctxt.dst_port, pkt_ctxt.pkt_len);
+    /* end stat */
 
 	--infodelay;
 	if (infoprint)

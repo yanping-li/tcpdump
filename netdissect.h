@@ -76,6 +76,7 @@ typedef signed char nd_int8_t;
 
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 #include "ip6.h" /* struct ip6 for nextproto6_cksum() */
+#include "stat.h" /* connection and stat */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* invalid string to print '(invalid)' for malformed or corrupted packets */
