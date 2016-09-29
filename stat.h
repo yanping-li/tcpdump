@@ -14,10 +14,10 @@ enum addr_type {
 };
 
 #define ip_addr __addr.__ip
-#define ip6_addr __addr.__ip6.__u6_addr
-#define ip6_addr8 __addr.__ip6.__u6_addr.__u6_addr8
-#define ip6_addr16 __addr.__ip6.__u6_addr.__u6_addr16
-#define ip6_addr32 __addr.__ip6.__u6_addr.__u6_addr32
+#define ip6_addr __addr.__ip6
+#define ip6_addr8 __addr.__ip6.s6_addr
+#define ip6_addr16 __addr.__ip6.s6_addr16
+#define ip6_addr32 __addr.__ip6.s6_addr32
 struct ipvx_addr {
     enum addr_type type;
     union {
