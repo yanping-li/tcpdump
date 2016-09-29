@@ -189,6 +189,11 @@ tcp_print(netdissect_options *ndo,
         sport = EXTRACT_16BITS(&tp->th_sport);
         dport = EXTRACT_16BITS(&tp->th_dport);
 
+        /* stat start */
+        pkt_ctxt.src_port = sport;
+        pkt_ctxt.dst_port = dport;
+        /* stat end */
+
         hlen = TH_OFF(tp) * 4;
 
         if (ip6) {

@@ -524,9 +524,17 @@ ip_print(netdissect_options *ndo,
 	uint16_t sum, ip_sum;
 	struct protoent *proto;
 
-    stat_ip++;
-
 	ipds->ip = (const struct ip *)bp;
+
+    /* stat start */
+    stat_ip++;
+    pkt_ctxt.src_ip.type = ADDR_IP;
+    memcpy(&pkt_ctxt.src_ip, &ipds->ip->ip_src, sizeof(uint32_t));
+    pkt_ctxt.dst_ip.type = ADDR_IP;
+    memcpy(&pkt_ctxt.dst_ip, &ipds->ip->ip_dst, sizeof(uint32_t));
+    pkt_ctxt.proto = ipds->ip->ip_p;
+    /* stat end */
+
 	ND_TCHECK(ipds->ip->ip_vhl);
 	if (IP_V(ipds->ip) != 4) { /* print version if != 4 */
 	    if (IP_V(ipds->ip) == 6)
