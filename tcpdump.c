@@ -1992,6 +1992,10 @@ main(int argc, char **argv)
 		error("unable to enter the capability mode");
 #endif	/* HAVE_CAPSICUM */
 
+    /* start conn */
+    global_ctxt.user = pcap_userdata;
+    /* end conn */
+
 	do {
 		status = pcap_loop(pd, cnt, callback, pcap_userdata);
 		if (WFileName == NULL) {
@@ -2106,6 +2110,11 @@ main(int argc, char **argv)
 		}
 	}
 	while (ret != NULL);
+
+    /* start conn */
+    conn_iterate(conn_print);
+    stat_print();
+    /* end conn */
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);

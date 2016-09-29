@@ -1,8 +1,20 @@
 
-#ifndef netdissect_conn_h
-#define netdissect_conn_h
+#ifndef netdissect_stat_h
+#define netdissect_stat_h
 
-#define CONN_TABLE_SIZE 65536
+#define CONN_HASHSIZE 65536
+
+struct global_context {
+    u_char *user;
+};
+
+struct pkt_context {
+    ipvx_addr src_addr;
+    ipvx_addr dst_addr;
+    uint8 proto;
+    uint16 src_port;
+    uint16 dst_port;
+};
 
 enum addr_type {
 	ADDR_IP,
@@ -10,10 +22,10 @@ enum addr_type {
 };
 
 #define ip_addr __addr.__ip
-#define ip6_addr.addr8 __addr.__ip6.__u6_addr.__u6_addr8
-#define ip6_addr.addr16 __addr.__ip6.__u6_addr.__u6_addr16
-#define ip6_addr.addr32 __addr.__ip6.__u6_addr.__u6_addr32
-
+#define ip6_addr __addr.__ip6.__u6_addr
+#define ip6_addr8 __addr.__ip6.__u6_addr.__u6_addr8
+#define ip6_addr16 __addr.__ip6.__u6_addr.__u6_addr16
+#define ip6_addr32 __addr.__ip6.__u6_addr.__u6_addr32
 struct ipvx_addr {
     enum addr_type type;
     union {
@@ -23,15 +35,6 @@ struct ipvx_addr {
 };
 
 bool ipvx_equal(struct ipvx_addr *addr1, struct ipvx_addr *addr2);
-
-struct pkt_context {
-    u_char *user;
-    ipvx_addr src_addr;
-    ipvx_addr dst_addr;
-    uint8 proto;
-    uint16 src_port;
-    uint16 dst_port;
-};
 
 struct conn {
     ipvx_addr src_ip;
@@ -50,7 +53,8 @@ struct conn_hash_entry {
     void *conn;
 };
 
-int conn_consume_pak(struct conn *, uint32 pak_len);
+int conn_consume_pak(struct ipvx_addr *src_addr, struct ipvx_addr *dst_addr,
+        uint8 proto, uint16 src_port, uint16 dst_port, uint32 pak_len);
 
 typedef int (*)(struct conn *conn) callback_t;
 
@@ -58,4 +62,4 @@ int conn_iterate(callback_t);
 
 int conn_print(struct conn *);
 
-#endif /* netdissect_conn_h */
+#endif /* netdissect_stat_h */

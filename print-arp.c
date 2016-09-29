@@ -304,6 +304,7 @@ arp_print(netdissect_options *ndo,
 	pro = PRO(ap);
 	op = OP(ap);
 
+    stat_arp++;
 
         /* if its ATM then call the ATM ARP printer
            for Frame-relay ARP most of the fields
@@ -357,6 +358,7 @@ arp_print(netdissect_options *ndo,
 	switch (op) {
 
 	case ARPOP_REQUEST:
+        stat_arp_request++;
 		ND_PRINT((ndo, "who-has %s", ipaddr_string(ndo, TPA(ap))));
 		if (memcmp((const char *)ezero, (const char *)THA(ap), HRD_LEN(ap)) != 0)
 			ND_PRINT((ndo, " (%s)",
@@ -365,6 +367,7 @@ arp_print(netdissect_options *ndo,
 		break;
 
 	case ARPOP_REPLY:
+        stat_arp_reply++;
 		ND_PRINT((ndo, "%s is-at %s",
                           ipaddr_string(ndo, SPA(ap)),
                           linkaddr_string(ndo, SHA(ap), linkaddr, HRD_LEN(ap))));
