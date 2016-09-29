@@ -235,7 +235,8 @@ LIBNETDISSECT_SRC=\
 	netdissect.c \
 	signature.c \
 	strtoaddr.c \
-	util-print.c
+	util-print.c \
+	stat.c
 
 LOCALSRC = @LOCALSRC@
 GENSRC = version.c
@@ -297,7 +298,8 @@ HDR = \
 	tcp.h \
 	netdissect-stdinc.h \
 	timeval-operations.h \
-	udp.h
+	udp.h \
+	stat.h
 
 TAGHDR = \
 	/usr/include/arpa/tftp.h \

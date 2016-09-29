@@ -524,6 +524,8 @@ ip_print(netdissect_options *ndo,
 	uint16_t sum, ip_sum;
 	struct protoent *proto;
 
+    stat_ip++;
+
 	ipds->ip = (const struct ip *)bp;
 	ND_TCHECK(ipds->ip->ip_vhl);
 	if (IP_V(ipds->ip) != 4) { /* print version if != 4 */
