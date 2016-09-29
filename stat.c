@@ -159,7 +159,9 @@ int conn_print(struct conn* conn)
         ND_PRINT((ndo, "src: %s %u  dst: %s %u",
                 ipaddr_string(ndo, &conn->src_ip.ip_addr), conn->src_port,
                 ipaddr_string(ndo, &conn->dst_ip.ip_addr), conn->dst_port));
-    } else {
+    }
+
+    if (conn->src_ip.type == ADDR_IP6) {
         ND_PRINT((ndo, "src: %s %u  dst: %s %u",
                 ip6addr_string(ndo, &conn->src_ip.ip6_addr), conn->src_port,
                 ip6addr_string(ndo, &conn->dst_ip.ip6_addr), conn->dst_port));

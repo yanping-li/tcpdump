@@ -9,7 +9,7 @@ struct global_context {
 };
 
 enum addr_type {
-	ADDR_IP = 0,
+	ADDR_IP = 1,
 	ADDR_IP6
 };
 
