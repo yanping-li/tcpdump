@@ -24,7 +24,9 @@ struct global_context global_ctxt;
 struct pkt_context pkt_ctxt;
 
 uint32_t stat_ip;
-uint32_t stat_ipfrag;
+uint32_t stat_ip_truncated_hdr;
+uint32_t stat_ip_first_frag;
+uint32_t stat_ip_non_first_frag;
 
 uint32_t stat_ip6;
 
@@ -191,15 +193,31 @@ void conn_iterate(conn_handler handler)
     }
 }
 
+void conn_tbl_print()
+{
+    netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
+
+    ND_PRINT((ndo, "\nConnection table:\n"));
+    conn_iterate(conn_print);
+}
+
 void stat_print()
 {
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
 
-    ND_PRINT((ndo, "IP:\n"));
+    ND_PRINT((ndo, "\nPacket stats:\n"));
+    ND_PRINT((ndo, "\nIP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ip));
-    ND_PRINT((ndo, "\t%u frag\n", stat_ipfrag));
+    ND_PRINT((ndo, "\t%u truncated-header\n", stat_ip_truncated_hdr));
+    ND_PRINT((ndo, "\t%u first-frag\n", stat_ip_first_frag));
+    ND_PRINT((ndo, "\t%u non-first-frag\n", stat_ip_non_first_frag));
 
-    ND_PRINT((ndo, "IP6:\n"));
+    ND_PRINT((ndo, "\nIP6:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ip6));
+
+    ND_PRINT((ndo, "\nARP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_arp));
+    ND_PRINT((ndo, "\t%u request\n", stat_arp_request));
+    ND_PRINT((ndo, "\t%u reply\n", stat_arp_reply));
 }
 

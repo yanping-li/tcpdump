@@ -2112,7 +2112,7 @@ main(int argc, char **argv)
 	while (ret != NULL);
 
     /* stat start */
-    conn_iterate(conn_print);
+    conn_tbl_print(conn_print);
     stat_print();
     /* stat end */
 
