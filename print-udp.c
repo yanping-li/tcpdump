@@ -365,6 +365,11 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	sport = EXTRACT_16BITS(&up->uh_sport);
 	dport = EXTRACT_16BITS(&up->uh_dport);
 
+    /* stat start */
+    pkt_ctxt.src_port = sport;
+    pkt_ctxt.dst_port = dport;
+    /* stat end */
+
 	if (length < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT((ndo, "truncated-udp %d", length));
