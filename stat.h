@@ -67,22 +67,46 @@ struct conn_hash_entry {
 extern struct global_context global_ctxt;
 extern struct pkt_context pkt_ctxt;
 
+
+extern uint32_t stat_pkt_total;
+
+extern uint32_t stat_lldp;
+extern uint32_t stat_stp;
+
 extern uint32_t stat_ip;
 extern uint32_t stat_ip_truncated_hdr;
 extern uint32_t stat_ip_first_frag;
 extern uint32_t stat_ip_non_first_frag;
 
-extern uint32_t stat_ip6;
+extern uint32_t stat_icmp;
+extern uint32_t stat_icmp_echo;
+extern uint32_t stat_icmp_echo_reply;
 
 extern uint32_t stat_arp;
 extern uint32_t stat_arp_request;
 extern uint32_t stat_arp_reply;
 
-extern int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
-        uint8_t proto, uint16_t src_port, uint16_t dst_port, uint32_t pak_len);
+extern uint32_t stat_ip6;
+
+extern uint32_t stat_icmp6;
+extern uint32_t stat_icmp6_echo;
+extern uint32_t stat_icmp6_echo_reply;
+extern uint32_t stat_icmp6_router_solicit;
+extern uint32_t stat_icmp6_router_advert;
+extern uint32_t stat_icmp6_neighbor_solicit;
+extern uint32_t stat_icmp6_neighbor_advert;
+
+extern uint32_t stat_udp;
+
+extern uint32_t stat_tcp;
+
+extern uint32_t stat_esp;
+extern uint32_t stat_ah;
+
+
+extern int consume_pak();
 typedef int (*conn_handler)(struct conn *conn);
-extern int conn_print(struct conn *);
-extern void conn_tbl_print(conn_handler);
+extern void conn_tbl_print();
 extern void stat_print();
 
 #endif /* netdissect_stat_h */

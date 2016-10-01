@@ -23,16 +23,42 @@
 struct global_context global_ctxt;
 struct pkt_context pkt_ctxt;
 
+
+uint32_t stat_pkt_total;
+
+uint32_t stat_lldp;
+uint32_t stat_stp;
+
 uint32_t stat_ip;
 uint32_t stat_ip_truncated_hdr;
 uint32_t stat_ip_first_frag;
 uint32_t stat_ip_non_first_frag;
 
-uint32_t stat_ip6;
+uint32_t stat_icmp;
+uint32_t stat_icmp_echo;
+uint32_t stat_icmp_echo_reply;
 
 uint32_t stat_arp;
 uint32_t stat_arp_request;
 uint32_t stat_arp_reply;
+
+uint32_t stat_ip6;
+
+uint32_t stat_icmp6;
+uint32_t stat_icmp6_echo;
+uint32_t stat_icmp6_echo_reply;
+uint32_t stat_icmp6_router_solicit;
+uint32_t stat_icmp6_router_advert;
+uint32_t stat_icmp6_neighbor_solicit;
+uint32_t stat_icmp6_neighbor_advert;
+
+uint32_t stat_udp;
+
+uint32_t stat_tcp;
+
+uint32_t stat_esp;
+uint32_t stat_ah;
+
 
 static struct conn_hash_entry *conn_hashtbl[CONN_HASHSIZE];
 
@@ -89,7 +115,7 @@ static uint32_t hash_5_tuple(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
     return addr_hash ^ app_hash;
 }
 
-int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
+static int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
         uint8_t proto, uint16_t src_port, uint16_t dst_port, uint32_t pkt_len)
 {
     struct conn_hash_entry *entry;
@@ -148,33 +174,42 @@ int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
     return 0;
 }
 
-int conn_print(struct conn* conn)
+int consume_pak()
+{
+    if (pkt_ctxt.src_ip.type == ADDR_IP || pkt_ctxt.src_ip.type == ADDR_IP6) {
+        return conn_consume_pak(&pkt_ctxt.src_ip, &pkt_ctxt.dst_ip, pkt_ctxt.proto, pkt_ctxt.src_port, pkt_ctxt.dst_port, pkt_ctxt.pkt_len);
+    }
+
+    return 0;
+}
+
+static int conn_print(struct conn* conn)
 {
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
 
     /*
      * Example output:
-     * src: 1.1.1.1 5012  dst: 2.2.2.2 80  proto: 6  total-paks: 27  total-bytes: 1552  in-paks: 12  in-bytes: 523  out-paks: 15  out-bytes: 1029
+     * total-paks: 27  total-bytes: 1552  in-paks: 12  in-bytes: 523  out-paks: 15  out-bytes: 1029  src: 1.1.1.1 5012  dst: 2.2.2.2 80  proto: 6
      */
 
+    ND_PRINT((ndo, "total-paks: %u  total-bytes: %u  in-paks: %u  in-bytes: %u  out-paks: %u  out-bytes: %u",
+            conn->in_paks + conn->out_paks, conn->in_bytes + conn->out_bytes,
+            conn->in_paks, conn->in_bytes,
+            conn->out_paks, conn->out_bytes));
+
     if (conn->src_ip.type == ADDR_IP) {
-        ND_PRINT((ndo, "src: %s %u  dst: %s %u",
+        ND_PRINT((ndo, "  src: %s %u  dst: %s %u",
                 ipaddr_string(ndo, &conn->src_ip.ip_addr), conn->src_port,
                 ipaddr_string(ndo, &conn->dst_ip.ip_addr), conn->dst_port));
     }
 
     if (conn->src_ip.type == ADDR_IP6) {
-        ND_PRINT((ndo, "src: %s %u  dst: %s %u",
+        ND_PRINT((ndo, "  src: %s %u  dst: %s %u",
                 ip6addr_string(ndo, &conn->src_ip.ip6_addr), conn->src_port,
                 ip6addr_string(ndo, &conn->dst_ip.ip6_addr), conn->dst_port));
     }
 
     ND_PRINT((ndo, "  proto: %s", tok2str(ipproto_values, NULL, conn->proto)));
-
-    ND_PRINT((ndo, "  total-paks: %u  total-bytes: %u  in-paks: %u  in-bytes: %u  out-paks: %u  out-bytes: %u",
-            conn->in_paks + conn->out_paks, conn->in_bytes + conn->out_bytes,
-            conn->in_paks, conn->in_bytes,
-            conn->out_paks, conn->out_bytes));
 
     ND_PRINT((ndo, "\n"));
 
@@ -206,18 +241,52 @@ void stat_print()
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
 
     ND_PRINT((ndo, "\nPacket stats:\n"));
+    ND_PRINT((ndo, "\t%u packets total\n", stat_pkt_total));
+
+    ND_PRINT((ndo, "\nLLDP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_lldp));
+
+    ND_PRINT((ndo, "\nSTP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_stp));
+
     ND_PRINT((ndo, "\nIP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ip));
-    ND_PRINT((ndo, "\t%u truncated-header\n", stat_ip_truncated_hdr));
-    ND_PRINT((ndo, "\t%u first-frag\n", stat_ip_first_frag));
-    ND_PRINT((ndo, "\t%u non-first-frag\n", stat_ip_non_first_frag));
+    ND_PRINT((ndo, "\t%u truncated header\n", stat_ip_truncated_hdr));
+    ND_PRINT((ndo, "\t%u first frag\n", stat_ip_first_frag));
+    ND_PRINT((ndo, "\t%u non first frag\n", stat_ip_non_first_frag));
 
-    ND_PRINT((ndo, "\nIP6:\n"));
-    ND_PRINT((ndo, "\t%u total\n", stat_ip6));
+    ND_PRINT((ndo, "\nICMP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_icmp));
+    ND_PRINT((ndo, "\t%u echo\n", stat_icmp_echo));
+    ND_PRINT((ndo, "\t%u echo reply\n", stat_icmp_echo_reply));
 
     ND_PRINT((ndo, "\nARP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_arp));
     ND_PRINT((ndo, "\t%u request\n", stat_arp_request));
     ND_PRINT((ndo, "\t%u reply\n", stat_arp_reply));
+
+    ND_PRINT((ndo, "\nIP6:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_ip6));
+
+    ND_PRINT((ndo, "\nICMP6:\n"));
+    ND_PRINT((ndo, "\t%u icmp6\n", stat_icmp6));
+    ND_PRINT((ndo, "\t%u icmp6 echo\n", stat_icmp6_echo));
+    ND_PRINT((ndo, "\t%u icmp6 echo reply\n", stat_icmp6_echo_reply));
+    ND_PRINT((ndo, "\t%u icmp6 router solicit\n", stat_icmp6_router_solicit));
+    ND_PRINT((ndo, "\t%u icmp6 router advert\n", stat_icmp6_router_advert));
+    ND_PRINT((ndo, "\t%u icmp6 neighbor solicit\n", stat_icmp6_neighbor_solicit));
+    ND_PRINT((ndo, "\t%u icmp6 neighbor advert\n", stat_icmp6_neighbor_advert));
+
+    ND_PRINT((ndo, "\nUDP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_udp));
+
+    ND_PRINT((ndo, "\nTCP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_tcp));
+
+    ND_PRINT((ndo, "\nESP:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_esp));
+
+    ND_PRINT((ndo, "\nAH:\n"));
+    ND_PRINT((ndo, "\t%u total\n", stat_ah));
 }
 

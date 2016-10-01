@@ -1380,6 +1380,10 @@ lldp_print(netdissect_options *ndo,
     const u_char *tptr;
     char *network_addr;
 
+    /* stat start */
+    stat_lldp++;
+    /* stat end */
+
     tptr = pptr;
     tlen = len;
 

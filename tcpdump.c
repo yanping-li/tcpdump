@@ -2112,7 +2112,7 @@ main(int argc, char **argv)
 	while (ret != NULL);
 
     /* stat start */
-    conn_tbl_print(conn_print);
+    conn_tbl_print();
     stat_print();
     /* stat end */
 
@@ -2501,13 +2501,13 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
     /* stat start */
     /* reset pkt context before print */
     memset(&pkt_ctxt, 0, sizeof(struct pkt_context));
+    stat_pkt_total++;
     /* stat end */
 
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
     /* stat start */
-    conn_consume_pak(&pkt_ctxt.src_ip, &pkt_ctxt.dst_ip, pkt_ctxt.proto,
-            pkt_ctxt.src_port, pkt_ctxt.dst_port, pkt_ctxt.pkt_len);
+    consume_pak();
     /* stat end */
 
 	--infodelay;
