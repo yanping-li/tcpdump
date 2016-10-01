@@ -81,6 +81,8 @@ extern uint32_t stat_ip_non_first_frag;
 extern uint32_t stat_icmp;
 extern uint32_t stat_icmp_echo;
 extern uint32_t stat_icmp_echo_reply;
+extern uint32_t stat_icmp_unreach;
+extern uint32_t stat_icmp_time_exceed;
 
 extern uint32_t stat_arp;
 extern uint32_t stat_arp_request;
@@ -100,11 +102,18 @@ extern uint32_t stat_udp;
 
 extern uint32_t stat_tcp;
 
+extern uint32_t stat_sctp;
+
 extern uint32_t stat_esp;
 extern uint32_t stat_ah;
 
+extern uint32_t stat_pim;
+extern uint32_t stat_igmp;
 
-extern int consume_pak();
+extern uint32_t stat_gre;
+
+
+extern int consume_pkt();
 typedef int (*conn_handler)(struct conn *conn);
 extern void conn_tbl_print();
 extern void stat_print();

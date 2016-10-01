@@ -528,13 +528,15 @@ ip_print(netdissect_options *ndo,
 
     /* stat start */
     stat_ip++;
-    pkt_ctxt.src_ip.type = ADDR_IP;
-    memcpy(&pkt_ctxt.src_ip.ip_addr, &ipds->ip->ip_src, sizeof(uint32_t));
-    pkt_ctxt.dst_ip.type = ADDR_IP;
-    memcpy(&pkt_ctxt.dst_ip.ip_addr, &ipds->ip->ip_dst, sizeof(uint32_t));
-    pkt_ctxt.proto = ipds->ip->ip_p;
-    if (!pkt_ctxt.pkt_len) {
-        pkt_ctxt.pkt_len = EXTRACT_16BITS(&ipds->ip->ip_len);
+    if (pkt_ctxt.src_ip.type == 0) {
+        pkt_ctxt.src_ip.type = ADDR_IP;
+        memcpy(&pkt_ctxt.src_ip.ip_addr, &ipds->ip->ip_src, sizeof(uint32_t));
+        pkt_ctxt.dst_ip.type = ADDR_IP;
+        memcpy(&pkt_ctxt.dst_ip.ip_addr, &ipds->ip->ip_dst, sizeof(uint32_t));
+        pkt_ctxt.proto = ipds->ip->ip_p;
+        if (!pkt_ctxt.pkt_len) {
+            pkt_ctxt.pkt_len = EXTRACT_16BITS(&ipds->ip->ip_len);
+        }
     }
     /* stat end */
 

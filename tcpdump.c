@@ -2507,7 +2507,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
     /* stat start */
-    consume_pak();
+    consume_pkt();
     /* stat end */
 
 	--infodelay;

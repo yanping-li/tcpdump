@@ -423,6 +423,10 @@ pim_print(netdissect_options *ndo,
 	register const u_char *ep;
 	register const struct pim *pim = (const struct pim *)bp;
 
+    /* stat start */
+    stat_pim++;
+    /* stat end */
+
 	ep = (const u_char *)ndo->ndo_snapend;
 	if (bp >= ep)
 		return;

@@ -505,6 +505,10 @@ void sctp_print(netdissect_options *ndo,
   const char *sep;
   int isforces = 0;
 
+  /* stat start */
+  stat_sctp++;
+  /* stat end */
+
   if (sctpPacketLength < sizeof(struct sctpHeader))
     {
       ND_PRINT((ndo, "truncated-sctp - %ld bytes missing!",

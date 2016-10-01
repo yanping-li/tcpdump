@@ -227,13 +227,15 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
     /* stat start */
     stat_ip6++;
-    pkt_ctxt.src_ip.type = ADDR_IP6;
-    memcpy(&pkt_ctxt.src_ip.ip6_addr, &ip6->ip6_src, sizeof(struct in6_addr));
-    pkt_ctxt.dst_ip.type = ADDR_IP6;
-    memcpy(&pkt_ctxt.dst_ip.ip6_addr, &ip6->ip6_dst, sizeof(struct in6_addr));
-    pkt_ctxt.proto = ip6->ip6_nxt;
-    if (!pkt_ctxt.pkt_len) {
-        pkt_ctxt.pkt_len = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr);
+    if (pkt_ctxt.src_ip.type == 0) {
+        pkt_ctxt.src_ip.type = ADDR_IP6;
+        memcpy(&pkt_ctxt.src_ip.ip6_addr, &ip6->ip6_src, sizeof(struct in6_addr));
+        pkt_ctxt.dst_ip.type = ADDR_IP6;
+        memcpy(&pkt_ctxt.dst_ip.ip6_addr, &ip6->ip6_dst, sizeof(struct in6_addr));
+        pkt_ctxt.proto = ip6->ip6_nxt;
+        if (!pkt_ctxt.pkt_len) {
+            pkt_ctxt.pkt_len = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr);
+        }
     }
     /* stat end */
 
