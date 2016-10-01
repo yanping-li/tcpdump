@@ -89,6 +89,10 @@ gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length, vers;
 
+    /* stat start */
+    stat_gre++;
+    /* stat end */
+
 	if (len < 2) {
 		ND_PRINT((ndo, "%s", tstr));
 		return;

@@ -447,6 +447,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
 			break;
 		}
+        /* stat start */
+        stat_icmp_unreach++;
+        /* stat end */
 		break;
 
 	case ICMP_REDIRECT:
@@ -526,6 +529,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			    dp->icmp_code);
 			break;
 		}
+        /* stat start */
+        stat_icmp_time_exceed++;
+        /* stat end */
 		break;
 
 	case ICMP_PARAMPROB:

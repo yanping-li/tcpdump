@@ -262,6 +262,10 @@ igmp_print(netdissect_options *ndo,
 {
     struct cksum_vec vec[1];
 
+    /* stat start */
+    stat_igmp++;
+    /* stat end */
+
     if (ndo->ndo_qflag) {
         ND_PRINT((ndo, "igmp"));
         return;

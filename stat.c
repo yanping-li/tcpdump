@@ -37,6 +37,8 @@ uint32_t stat_ip_non_first_frag;
 uint32_t stat_icmp;
 uint32_t stat_icmp_echo;
 uint32_t stat_icmp_echo_reply;
+uint32_t stat_icmp_unreach;
+uint32_t stat_icmp_time_exceed;
 
 uint32_t stat_arp;
 uint32_t stat_arp_request;
@@ -56,11 +58,20 @@ uint32_t stat_udp;
 
 uint32_t stat_tcp;
 
+uint32_t stat_sctp;
+
 uint32_t stat_esp;
 uint32_t stat_ah;
 
+uint32_t stat_pim;
+uint32_t stat_igmp;
+
+uint32_t stat_gre;
+
 
 static struct conn_hash_entry *conn_hashtbl[CONN_HASHSIZE];
+static uint32_t udp_port_pkts[65536];
+static uint32_t tcp_port_pkts[65536];
 
 /* to be called in conn_consume_pkt() */
 int stat_proto_port(uint8_t proto, uint16_t port)
@@ -115,7 +126,7 @@ static uint32_t hash_5_tuple(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
     return addr_hash ^ app_hash;
 }
 
-static int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
+static int conn_consume_pkt(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
         uint8_t proto, uint16_t src_port, uint16_t dst_port, uint32_t pkt_len)
 {
     struct conn_hash_entry *entry;
@@ -174,10 +185,17 @@ static int conn_consume_pak(struct ipvx_addr *src_ip, struct ipvx_addr *dst_ip,
     return 0;
 }
 
-int consume_pak()
+int consume_pkt()
 {
     if (pkt_ctxt.src_ip.type == ADDR_IP || pkt_ctxt.src_ip.type == ADDR_IP6) {
-        return conn_consume_pak(&pkt_ctxt.src_ip, &pkt_ctxt.dst_ip, pkt_ctxt.proto, pkt_ctxt.src_port, pkt_ctxt.dst_port, pkt_ctxt.pkt_len);
+        conn_consume_pkt(&pkt_ctxt.src_ip, &pkt_ctxt.dst_ip, pkt_ctxt.proto, pkt_ctxt.src_port, pkt_ctxt.dst_port, pkt_ctxt.pkt_len);
+    }
+
+    if (pkt_ctxt.proto == IPPROTO_UDP) {
+        udp_port_pkts[pkt_ctxt.dst_port]++;
+    }
+    if (pkt_ctxt.proto == IPPROTO_TCP) {
+        tcp_port_pkts[pkt_ctxt.dst_port]++;
     }
 
     return 0;
@@ -236,6 +254,25 @@ void conn_tbl_print()
     conn_iterate(conn_print);
 }
 
+static void print_pkts_per_port() {
+    int port;
+    netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
+
+    ND_PRINT((ndo, "\nUDP port\tPackets\n"));
+    for (port = 0; port < 65536; port++) {
+        if (udp_port_pkts[port]) {
+            ND_PRINT((ndo, "%u\t\t%u\n", port, udp_port_pkts[port]));
+        }
+    }
+    
+    ND_PRINT((ndo, "\nTCP port\tPackets\n"));
+    for (port = 0; port < 65536; port++) {
+        if (tcp_port_pkts[port]) {
+            ND_PRINT((ndo, "%u\t\t%u\n", port, tcp_port_pkts[port]));
+        }
+    }
+}
+
 void stat_print()
 {
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
@@ -288,5 +325,7 @@ void stat_print()
 
     ND_PRINT((ndo, "\nAH:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ah));
+
+    print_pkts_per_port();
 }
 
