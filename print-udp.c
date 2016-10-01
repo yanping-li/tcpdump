@@ -351,6 +351,13 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	if (ep > ndo->ndo_snapend)
 		ep = ndo->ndo_snapend;
 	up = (const struct udphdr *)bp;
+
+    /* stat start */
+    stat_udp++;
+    pkt_ctxt.src_port = EXTRACT_16BITS(&up->uh_sport);
+    pkt_ctxt.dst_port = EXTRACT_16BITS(&up->uh_dport);
+    /* stat end */
+
 	ip = (const struct ip *)bp2;
 	if (IP_V(ip) == 6)
 		ip6 = (const struct ip6_hdr *)bp2;
@@ -364,11 +371,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 	sport = EXTRACT_16BITS(&up->uh_sport);
 	dport = EXTRACT_16BITS(&up->uh_dport);
-
-    /* stat start */
-    pkt_ctxt.src_port = sport;
-    pkt_ctxt.dst_port = dport;
-    /* stat end */
 
 	if (length < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
