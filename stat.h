@@ -115,7 +115,6 @@ extern uint32_t stat_gre;
 
 extern int consume_pkt();
 typedef int (*conn_handler)(struct conn *conn);
-extern void conn_tbl_print();
 extern void stat_print();
 
 #endif /* netdissect_stat_h */

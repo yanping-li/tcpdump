@@ -371,9 +371,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 
     stp_bpdu = (const struct stp_bpdu_*)p;
 
-    /* stat start */
     stat_stp++;
-    /* stat end */
 
     /* Minimum STP Frame size. */
     if (length < 4)

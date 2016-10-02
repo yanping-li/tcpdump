@@ -73,11 +73,6 @@ static struct conn_hash_entry *conn_hashtbl[CONN_HASHSIZE];
 static uint32_t udp_port_pkts[65536];
 static uint32_t tcp_port_pkts[65536];
 
-/* to be called in conn_consume_pkt() */
-int stat_proto_port(uint8_t proto, uint16_t port)
-{
-    return 0;
-}
 
 static int ipvx_equal(struct ipvx_addr *addr1, struct ipvx_addr *addr2)
 {
@@ -207,27 +202,27 @@ static int conn_print(struct conn* conn)
 
     /*
      * Example output:
-     * total-paks: 27  total-bytes: 1552  in-paks: 12  in-bytes: 523  out-paks: 15  out-bytes: 1029  src: 1.1.1.1 5012  dst: 2.2.2.2 80  proto: 6
+     * src: 1.1.1.1 5012  dst: 2.2.2.2 80  proto: 6  total-paks: 27  total-bytes: 1552  in-paks: 12  in-bytes: 523  out-paks: 15  out-bytes: 1029
      */
 
-    ND_PRINT((ndo, "total-paks: %u  total-bytes: %u  in-paks: %u  in-bytes: %u  out-paks: %u  out-bytes: %u",
-            conn->in_paks + conn->out_paks, conn->in_bytes + conn->out_bytes,
-            conn->in_paks, conn->in_bytes,
-            conn->out_paks, conn->out_bytes));
-
     if (conn->src_ip.type == ADDR_IP) {
-        ND_PRINT((ndo, "  src: %s %u  dst: %s %u",
+        ND_PRINT((ndo, "src: %s %u  dst: %s %u",
                 ipaddr_string(ndo, &conn->src_ip.ip_addr), conn->src_port,
                 ipaddr_string(ndo, &conn->dst_ip.ip_addr), conn->dst_port));
     }
 
     if (conn->src_ip.type == ADDR_IP6) {
-        ND_PRINT((ndo, "  src: %s %u  dst: %s %u",
+        ND_PRINT((ndo, "src: %s %u  dst: %s %u",
                 ip6addr_string(ndo, &conn->src_ip.ip6_addr), conn->src_port,
                 ip6addr_string(ndo, &conn->dst_ip.ip6_addr), conn->dst_port));
     }
 
     ND_PRINT((ndo, "  proto: %s", tok2str(ipproto_values, NULL, conn->proto)));
+
+    ND_PRINT((ndo, "  total-paks: %u  total-bytes: %u  in-paks: %u  in-bytes: %u  out-paks: %u  out-bytes: %u",
+            conn->in_paks + conn->out_paks, conn->in_bytes + conn->out_bytes,
+            conn->in_paks, conn->in_bytes,
+            conn->out_paks, conn->out_bytes));
 
     ND_PRINT((ndo, "\n"));
 
@@ -246,66 +241,71 @@ void conn_iterate(conn_handler handler)
     }
 }
 
-void conn_tbl_print()
+static void print_conn_table()
 {
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
 
-    ND_PRINT((ndo, "\nConnection table:\n"));
+    ND_PRINT((ndo, "\n- Connection table\n"));
     conn_iterate(conn_print);
+    ND_PRINT((ndo, "- Connection table end\n"));
 }
 
 static void print_pkts_per_port() {
     int port;
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
 
-    ND_PRINT((ndo, "\nUDP port\tPackets\n"));
+    ND_PRINT((ndo, "\n- UDP packets per port\n"));
+    ND_PRINT((ndo, "Port\t\tPackets\n"));
     for (port = 0; port < 65536; port++) {
         if (udp_port_pkts[port]) {
             ND_PRINT((ndo, "%u\t\t%u\n", port, udp_port_pkts[port]));
         }
     }
+    ND_PRINT((ndo, "- UDP packets per port end\n"));
     
-    ND_PRINT((ndo, "\nTCP port\tPackets\n"));
+    ND_PRINT((ndo, "\n- TCP packets per port\n"));
+    ND_PRINT((ndo, "Port\t\tPackets\n"));
     for (port = 0; port < 65536; port++) {
         if (tcp_port_pkts[port]) {
             ND_PRINT((ndo, "%u\t\t%u\n", port, tcp_port_pkts[port]));
         }
     }
+    ND_PRINT((ndo, "- TCP packets per port end\n"));
 }
 
-void stat_print()
+void print_counters()
 {
     netdissect_options *ndo = (netdissect_options *)global_ctxt.user;
 
-    ND_PRINT((ndo, "\nPacket stats:\n"));
+    ND_PRINT((ndo, "\n- Packet counters\n"));
     ND_PRINT((ndo, "\t%u packets total\n", stat_pkt_total));
 
-    ND_PRINT((ndo, "\nLLDP:\n"));
+    ND_PRINT((ndo, "LLDP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_lldp));
 
-    ND_PRINT((ndo, "\nSTP:\n"));
+    ND_PRINT((ndo, "STP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_stp));
 
-    ND_PRINT((ndo, "\nIP:\n"));
+    ND_PRINT((ndo, "IP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ip));
     ND_PRINT((ndo, "\t%u truncated header\n", stat_ip_truncated_hdr));
     ND_PRINT((ndo, "\t%u first frag\n", stat_ip_first_frag));
     ND_PRINT((ndo, "\t%u non first frag\n", stat_ip_non_first_frag));
 
-    ND_PRINT((ndo, "\nICMP:\n"));
+    ND_PRINT((ndo, "ICMP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_icmp));
     ND_PRINT((ndo, "\t%u echo\n", stat_icmp_echo));
     ND_PRINT((ndo, "\t%u echo reply\n", stat_icmp_echo_reply));
 
-    ND_PRINT((ndo, "\nARP:\n"));
+    ND_PRINT((ndo, "ARP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_arp));
     ND_PRINT((ndo, "\t%u request\n", stat_arp_request));
     ND_PRINT((ndo, "\t%u reply\n", stat_arp_reply));
 
-    ND_PRINT((ndo, "\nIP6:\n"));
+    ND_PRINT((ndo, "IP6:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ip6));
 
-    ND_PRINT((ndo, "\nICMP6:\n"));
+    ND_PRINT((ndo, "ICMP6:\n"));
     ND_PRINT((ndo, "\t%u icmp6\n", stat_icmp6));
     ND_PRINT((ndo, "\t%u icmp6 echo\n", stat_icmp6_echo));
     ND_PRINT((ndo, "\t%u icmp6 echo reply\n", stat_icmp6_echo_reply));
@@ -314,18 +314,23 @@ void stat_print()
     ND_PRINT((ndo, "\t%u icmp6 neighbor solicit\n", stat_icmp6_neighbor_solicit));
     ND_PRINT((ndo, "\t%u icmp6 neighbor advert\n", stat_icmp6_neighbor_advert));
 
-    ND_PRINT((ndo, "\nUDP:\n"));
+    ND_PRINT((ndo, "UDP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_udp));
 
-    ND_PRINT((ndo, "\nTCP:\n"));
+    ND_PRINT((ndo, "TCP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_tcp));
 
-    ND_PRINT((ndo, "\nESP:\n"));
+    ND_PRINT((ndo, "ESP:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_esp));
 
-    ND_PRINT((ndo, "\nAH:\n"));
+    ND_PRINT((ndo, "AH:\n"));
     ND_PRINT((ndo, "\t%u total\n", stat_ah));
 
-    print_pkts_per_port();
+    ND_PRINT((ndo, "- Packet counters end\n"));
 }
 
+void stat_print() {
+    print_counters();
+    print_pkts_per_port();
+    print_conn_table();
+}

@@ -225,7 +225,6 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ip6 = (const struct ip6_hdr *)bp;
 
-    /* stat start */
     stat_ip6++;
     if (pkt_ctxt.src_ip.type == 0) {
         pkt_ctxt.src_ip.type = ADDR_IP6;
@@ -237,7 +236,6 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
             pkt_ctxt.pkt_len = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr);
         }
     }
-    /* stat end */
 
 	ND_TCHECK(*ip6);
 	if (length < sizeof (struct ip6_hdr)) {

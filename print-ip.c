@@ -526,7 +526,6 @@ ip_print(netdissect_options *ndo,
 
 	ipds->ip = (const struct ip *)bp;
 
-    /* stat start */
     stat_ip++;
     if (pkt_ctxt.src_ip.type == 0) {
         pkt_ctxt.src_ip.type = ADDR_IP;
@@ -538,7 +537,6 @@ ip_print(netdissect_options *ndo,
             pkt_ctxt.pkt_len = EXTRACT_16BITS(&ipds->ip->ip_len);
         }
     }
-    /* stat end */
 
 	ND_TCHECK(ipds->ip->ip_vhl);
 	if (IP_V(ipds->ip) != 4) { /* print version if != 4 */
@@ -553,9 +551,7 @@ ip_print(netdissect_options *ndo,
 	ND_TCHECK(*ipds->ip);
 	if (length < sizeof (struct ip)) {
 		ND_PRINT((ndo, "truncated-ip %u", length));
-        /* stat start */
         stat_ip_truncated_hdr++;
-        /* stat end */
 		return;
 	}
 	hlen = IP_HL(ipds->ip) * 4;
@@ -654,11 +650,9 @@ ip_print(netdissect_options *ndo,
 	 * level protocol.
 	 */
 	if ((ipds->off & 0x1fff) == 0) {
-        /* stat start */
         if (ipds->off & IP_MF) {
             stat_ip_first_frag++;
         }
-        /* stat end */
 		ipds->cp = (const u_char *)ipds->ip + hlen;
 		ipds->nh = ipds->ip->ip_p;
 
@@ -670,9 +664,7 @@ ip_print(netdissect_options *ndo,
 		}
 		ip_print_demux(ndo, ipds);
 	} else {
-        /* stat start */
         stat_ip_non_first_frag++;
-        /* stat end */
 	    /* Ultra quiet now means that all this stuff should be suppressed */
 	    if (ndo->ndo_qflag > 1) return;
 
