@@ -878,9 +878,7 @@ icmp6_print(netdissect_options *ndo,
 	const u_char *ep;
 	u_int prot;
 
-    /* stat start */
     stat_icmp6++;
-    /* stat end */
 
 	dp = (const struct icmp6_hdr *)bp;
 	ip = (const struct ip6_hdr *)bp2;
@@ -1007,7 +1005,6 @@ icmp6_print(netdissect_options *ndo,
                 ND_TCHECK(dp->icmp6_seq);
                 ND_PRINT((ndo,", seq %u", EXTRACT_16BITS(&dp->icmp6_seq)));
 
-        /* stat start */
         if (dp->icmp6_type == ICMP6_ECHO_REQUEST) {
             stat_icmp6_echo++;
             pkt_ctxt.src_port = EXTRACT_16BITS(&dp->icmp6_id);
@@ -1017,7 +1014,6 @@ icmp6_print(netdissect_options *ndo,
             pkt_ctxt.src_port = EXTRACT_16BITS(&dp->icmp6_seq);
             pkt_ctxt.dst_port = EXTRACT_16BITS(&dp->icmp6_id);
         }
-        /* stat end */
 
 		break;
 	case ICMP6_MEMBERSHIP_QUERY:
@@ -1042,11 +1038,7 @@ icmp6_print(netdissect_options *ndo,
 			icmp6_opt_print(ndo, (const u_char *)dp + RTSOLLEN,
 					length - RTSOLLEN);
 		}
-
-        /* stat start */
         stat_icmp6_router_solicit++;
-        /* stat end */
-
 		break;
 	case ND_ROUTER_ADVERT:
 #define RTADVLEN 16
@@ -1067,11 +1059,7 @@ icmp6_print(netdissect_options *ndo,
 			icmp6_opt_print(ndo, (const u_char *)dp + RTADVLEN,
 					length - RTADVLEN);
 		}
-
-        /* stat start */
         stat_icmp6_router_advert++;
-        /* stat end */
-
 		break;
 	case ND_NEIGHBOR_SOLICIT:
 	    {
@@ -1084,11 +1072,7 @@ icmp6_print(netdissect_options *ndo,
 			icmp6_opt_print(ndo, (const u_char *)dp + NDSOLLEN,
 					length - NDSOLLEN);
 		}
-
-        /* stat start */
         stat_icmp6_neighbor_solicit++;
-        /* stat end */
-
 	    }
 		break;
 	case ND_NEIGHBOR_ADVERT:
@@ -1109,11 +1093,7 @@ icmp6_print(netdissect_options *ndo,
 					length - NDADVLEN);
 #undef NDADVLEN
 		}
-
-        /* stat start */
         stat_icmp6_neighbor_advert++;
-        /* stat end */
-
 	    }
 		break;
 	case ND_REDIRECT:

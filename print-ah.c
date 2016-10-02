@@ -44,11 +44,9 @@ ah_print(netdissect_options *ndo, register const u_char *bp)
 
 	ah = (const struct ah *)bp;
 
-    /* stat start */
     stat_ah++;
     pkt_ctxt.src_port = (uint16_t)(EXTRACT_32BITS(&ah->ah_spi) & 0x0000FFFF);
     pkt_ctxt.dst_port = (uint16_t)((EXTRACT_32BITS(&ah->ah_spi) & 0xFFFF0000) >> 16);
-    /* stat end */
 
 	ep = ndo->ndo_snapend;		/* 'ep' points to the end of available data. */
 

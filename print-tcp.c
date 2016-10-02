@@ -174,11 +174,9 @@ tcp_print(netdissect_options *ndo,
 
         tp = (const struct tcphdr *)bp;
 
-        /* stat start */
         stat_tcp++;
         pkt_ctxt.src_port = EXTRACT_16BITS(&tp->th_sport);
         pkt_ctxt.dst_port = EXTRACT_16BITS(&tp->th_dport);
-        /* stat end */
 
         ip = (const struct ip *)bp2;
         if (IP_V(ip) == 6)

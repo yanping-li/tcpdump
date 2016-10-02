@@ -604,11 +604,9 @@ esp_print(netdissect_options *ndo,
 
 	esp = (const struct newesp *)bp;
 
-    /* stat start */
     stat_esp++;
     pkt_ctxt.src_port = (uint16_t)(EXTRACT_32BITS(&esp->esp_spi) & 0x0000FFFF);
     pkt_ctxt.dst_port = (uint16_t)((EXTRACT_32BITS(&esp->esp_spi) & 0xFFFF0000) >> 16);
-    /* stat end */
 
 #ifdef HAVE_LIBCRYPTO
 	secret = NULL;
