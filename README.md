@@ -1,3 +1,74 @@
+# changes based on tcpdump
+
+At the end of tcpdump output, display statistics info for the capture. It includes
+- Packet counters based on protocol
+- Packet counters based on UDP/TCP port
+- Packet counters based on connection
+
+This gives you a overview on the capture. Below is an example output.
+
+~~~
+- Packet counters
+        21263 packets total
+LLDP:
+        0 total
+STP:
+        0 total
+IP:
+        21263 total
+        0 truncated header
+        0 first frag
+        0 non first frag
+ICMP:
+        0 total
+        0 echo
+        0 echo reply
+ARP:
+        0 total
+        0 request
+        0 reply
+IP6:
+        0 total
+ICMP6:
+        0 icmp6
+        0 icmp6 echo
+        0 icmp6 echo reply
+        0 icmp6 router solicit
+        0 icmp6 router advert
+        0 icmp6 neighbor solicit
+        0 icmp6 neighbor advert
+UDP:
+        4 total
+TCP:
+        21259 total
+ESP:
+        0 total
+AH:
+        0 total
+- Packet counters end
+
+- UDP packets per port
+Port            Packets
+138             1
+5405            3
+- UDP packets per port end
+
+- TCP packets per port
+Port            Packets
+22              6818
+5672            6
+42542           6
+57055           14429
+- TCP packets per port end
+
+- Connection table
+src: 10.163.65.0 138  dst: 10.163.67.255 138  proto: UDP  total-paks: 1  total-bytes: 275  in-paks: 1  in-bytes: 275  out-paks: 0  out-bytes: 0
+src: 10.50.21.58 5672  dst: 10.163.64.140 42542  proto: TCP  total-paks: 12  total-bytes: 4335  in-paks: 6  in-bytes: 1101  out-paks: 6  out-bytes: 3234
+src: 10.163.64.222 5404  dst: 239.192.165.23 5405  proto: UDP  total-paks: 3  total-bytes: 441  in-paks: 3  in-bytes: 441  out-paks: 0  out-bytes: 0
+src: 10.163.64.140 22  dst: 172.21.61.99 57055  proto: TCP  total-paks: 21247  total-bytes: 3790696  in-paks: 14429  in-bytes: 3516152  out-paks: 6818  out-bytes: 274544
+- Connection table end
+~~~
+
 # tcpdump
 
 [![Build
